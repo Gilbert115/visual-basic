@@ -36,3 +36,7 @@
 
 
     End Sub
+    
+        Private Sub BtnClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnClear.Click
+        Me.Close()
+    End Sub
