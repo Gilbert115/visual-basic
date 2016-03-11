@@ -1,0 +1,162 @@
+Dim GshrSolution As Short() = {0, 3, 2, 1, 0, 0, 3}
+    Dim GshrAnswer As Short() = {-1, -1, -1, -1, -1, -1, -1}
+
+    Dim GstrQuestions As String(,) = { _
+        {"English Springer Spaniel", "Akita", "Husky", "Bearded Collie", "dog051.jpg"}, _
+        {"Plug", "Whippet", "Fox Terrier", "English Setter", "dog50.jbg"}, _
+        {"Chow Chow", "Beagle", "Labrador Retriever", "Foxhound", "dog068.jpg"}, _
+        {"Great Dane", "Dacsshund", "Samoyed", "NewFoundLand" "dog044.jpg"}, _
+        {"Samoyed", "Pekingese", "English Setter", "Pomeranian" "dog088.jpg"}, _
+        {"Old English SheepDog", "Saluki", "Rottweiler", "Poodle" "dog074.jpg"}, _
+        {"Collie", "Boston Terrier", "Bichon Frise", "Akita" "dog007.jpg}}
+
+    Dim GshrCurrentQuestion As Short = 0
+
+    Private Sub DisplayQueston(ByVal shrQuestion As Short)
+
+        Dim shrindex As Short
+
+        'Check if user clicked previous button with question 1 displayed
+        If shrQuestion < 0 Then
+            MessageBox.Show("You are already at the beginning of the quiz.", "Know Your Dogs Quiz")
+            GshrCurrentQuestion = 0
+            Exit Sub
+        End If
+
+        'Store user's answer to previous question in gshrAnswers array
+        Select Case True
+            Case radAnswer1.Checked
+                GshrAnswer(GshrCurrentQuestion) = 0
+                radAnswer1.Checked = False
+            Case radAnswer2.Checked
+                GshrAnswer(GshrCurrentQuestion) = 1
+                radAnswer2.Checked = False
+            Case radAnswer3.Checked
+                GshrAnswer(GshrCurrentQuestion) = 0
+                radAnswer3.Checked = False
+            Case radAnswer4.Checked
+                GshrAnswer(GshrCurrentQuestion) = 3
+                radAnswer4.Checked = False
+        End Select
+
+        If shrQuestion > GstrQuestions.GetUpperBound(0) Then
+
+            If MessageBox.Show("You have answered the right question. Would you lioke to display the final quiz result and exit the quiz?" _
+                & ControlChars.NewLine & ControlChars.NewLine _
+                & "Click No to return .", "End of quiz", _
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question, _
+                MessageBoxDefaultButton.Button2) = DialogResult.Yes Then
+
+                If QuizResult() Then
+                    MessageBox.Show("Congratulations! You passed!", "Know Your Dog Quiz")
+                Else
+                    MessageBox.Show("Sorry, You did not pass the quiz.", "Know Your Dog Quiz")
+                End If
+                Me.Close()
+            Else
+                GshrCurrentQuestion = Convert.ToInt16(gstrQuestions.GetUpperBound(0))
+            End If
+            Exit Sub
+        End If
+
+        'update controls for next question
+        For shrindex = 0 To 3
+            grpAnswer.Controls(shrindex).Text = gstrQuestions(shrQuestion, shrindex)
+        Next
+
+        PicQuestion.Image = Image.FromFile(gstrQuestions(shrQuestion, 4))
+        StbQuestions.Panels(0).Text = "Question " & shrQuestion + 1 & " of " & gstrQuestions.GetUpperBound(0) + 1
+
+        Select Case GshrAnswer(shrQuestion)
+            Case 0
+                radAnswer1.Checked = True
+            Case 2
+                radAnswer2.Checked = True
+            Case 3
+                radAnswer3.Checked = True
+            Case 4
+                radAnswer4.Checked = True
+        End Select
+
+        GshrCurrentQuestion = shrQuestion
+
+    End Sub
+
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        DisplayQueston(0) 'Display the First question
+    End Sub
+
+    Private Sub mnuFirst_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFirst.Click
+        DisplayQueston(0) 'Display the first question 
+    End Sub
+
+    Private Sub mnuPrevious_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuPrevious.Click
+        DisplayQueston(GshrCurrentQuestion + Convert.ToInt16(1)) 'Display the Previous question
+    End Sub
+
+    Private Sub mnuNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuNext.Click
+        DisplayQueston(GshrCurrentQuestion + Convert.ToInt16(1)) 'Display the next question 
+    End Sub
+
+    Private Sub mnuLast_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLast.Click
+        DisplayQueston(Convert.ToInt16(GstrQuestions.GetUpperBound(0))) 'Display The Last question
+    End Sub
+
+    Private Sub mnuExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuExit.Click
+        Me.Close() 'Exit Application
+    End Sub
+
+    Private Sub mnuFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFont.Click
+
+        fodQuestion.Font = radAnswer1.Font
+
+        If fodQuestion.ShowDialog() = DialogResult.OK Then
+            radAnswer1.Font = fodQuestion.Font
+            radAnswer2.Font = fodQuestion.Font
+            radAnswer3.Font = fodQuestion.Font
+            radAnswer4.Font = fodQuestion.Font
+        End If
+
+    End Sub
+
+    Private Function QuizResult() As Boolean
+
+        Dim shrIndex As Short
+        For shrIndex = 0 To 6
+            If GshrSolution(shrIndex) <> GshrAnswer(shrIndex) Then
+                Return False
+            End If
+        Next
+        QuizResult = True
+
+    End Function
+
+    Private Sub cmuPrevious_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmuPrevious.Click
+        mnuPrevious.PerformClick() 'Click the previous command as the Questions menu
+    End Sub
+
+    Private Sub cmuNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmuNext.Click
+        mnuNext.PerformClick() 'Click the next command as the Question menu
+    End Sub
+
+    Private Sub cmuFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmuFont.Click
+        mnuFont.PerformClick() 'Click the Font command on the options menu
+    End Sub
+
+    Private Sub cmuFinish_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmuFinish.Click
+        DisplayQueston(Convert.ToInt16(GstrQuestions.GetUpperBound(0) + 1))
+        'Navigate past the Last Question
+    End Sub
+
+    Private Sub cmuExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmuExit.Click
+        mnuExit.PerformClick() 'Click the previous command on the file menu
+    End Sub
+
+    Private Sub btnPrevious_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrevious.Click
+        mnuPrevious.PerformClick() 'Click the previous command as the Questions menu
+    End Sub
+
+    Private Sub btnNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNext.Click
+        mnuNext.PerformClick() 'Click the next command as the Question menu
+    End Sub
+End Class
